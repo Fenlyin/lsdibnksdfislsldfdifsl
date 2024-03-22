@@ -1,7 +1,7 @@
 proxy-providers:
   bajie:
     type: http
-    url: https://bajie.bid/api/v1/client/subscribe?token=3048dafe51b1433c07f9ea54354d6cb5
+    url: https://bajie.xyz/api/v1/client/subscribe?token=3048dafe51b1433c07f9ea54354d6cb5
     path: ./profiles/bajie.yml
     health-check:
       enable: true
