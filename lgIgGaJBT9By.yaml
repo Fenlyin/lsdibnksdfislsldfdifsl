@@ -5,7 +5,7 @@ proxy-providers:
     path: ./profiles/bajie.yml
     health-check:
       enable: true
-      url: 'http://YouTube.com/generate_204'    
+      url: 'http://YouTube.com/'    
       interval: 300
 
   mojie:
@@ -14,7 +14,7 @@ proxy-providers:
     path: ./profiles/mojie.yml
     health-check:
       enable: true
-      url: 'http://YouTube.com/generate_204'
+      url: 'http://YouTube.com/'
       interval: 300
   
   flywhaler:
@@ -23,7 +23,7 @@ proxy-providers:
     path: ./profiles/flywhaler.yml
     health-check:
       enable: true
-      url:  'http://YouTube.com/generate_204'
+      url:  'http://YouTube.com/'
       interval: 300
 
 proxy-groups: 
@@ -31,6 +31,7 @@ proxy-groups:
     - {name: 'Proxy', type: select, use: [bajie, flywhaler, mojie], proxies: [DIRECT]}
 
 rules:
+  - DOMAIN-SUFFIX,services.googleapis.cn,Proxy
   - RULE-SET,applications,Direct
   - DOMAIN,clash.razord.top,Direct
   - DOMAIN,yacd.haishan.me,Direct
