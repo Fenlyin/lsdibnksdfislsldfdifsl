@@ -10,7 +10,7 @@ proxy-providers:
 
   mojie:
     type: http
-    url: https://mo.mojieurl.com/api/v1/client/subscribe?token=44929dbeb2c464b373e6d6be28c49b55&flag
+    url: https://mo.mojieurl.com/api/v1/client/subscribe?token=44929dbeb2c464b373e6d6be28c49b55
     path: ./profiles/mojie.yml
     health-check:
       enable: true
