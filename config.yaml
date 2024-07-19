@@ -20,26 +20,36 @@ proxy-providers:
 
 proxy-groups: 
     - {name: 'Direct', type: select, use: [bajie, flywhaler], proxies: [DIRECT]}
-    - {name: 'Proxy', type: select, use: [bajie, flywhaler], proxies: [DIRECT]}
+    - {name: 'US', type: select, use: [bajie, flywhaler], proxies: [DIRECT]}
+    - {name: 'JP', type: select, use: [bajie, flywhaler], proxies: [DIRECT]}
+    - {name: 'Asia', type: select, use: [bajie, flywhaler], proxies: [DIRECT]}
 
 rules:
-  - DOMAIN-SUFFIX,services.googleapis.cn,Proxy
-  - RULE-SET,applications,Direct
+# Personizations
+
   - DOMAIN,clash.razord.top,Direct
   - DOMAIN,yacd.haishan.me,Direct
+  - DOMAIN-SUFFIX,services.googleapis.cn,US
+  
+  # BreakSnow
+  - PROCESS-NAME,Game.exe, Asia
+
+ 
+# Rule sets
+  - RULE-SET,applications,Direct
   - RULE-SET,private,Direct
   - RULE-SET,reject,REJECT
-  - RULE-SET,icloud,Proxy
-  - RULE-SET,apple,Proxy
-  - RULE-SET,google,Proxy
-  - RULE-SET,proxy,Proxy
+  - RULE-SET,icloud,US
+  - RULE-SET,apple,US
+  - RULE-SET,google,US
+  - RULE-SET,proxy,US
   - RULE-SET,direct,Direct
   - RULE-SET,lancidr,Direct
   - RULE-SET,cncidr,Direct
-  - RULE-SET,telegramcidr,Proxy
+  - RULE-SET,telegramcidr,US
   - GEOIP,LAN,Direct
   - GEOIP,CN,Direct
-  - MATCH,Proxy
+  - MATCH,US
 
 
 rule-providers:
