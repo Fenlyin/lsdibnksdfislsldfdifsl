@@ -3,7 +3,6 @@ socks-port: 7891
 allow-lan: true
 mode: rule
 log-level: info
-external-controller: '127.0.0.1:9090'
 clash-for-android:
     append-system-dns: false
 experimental:
@@ -53,10 +52,16 @@ rules:
 - DOMAIN,clash.razord.top,Direct
 - DOMAIN,yacd.haishan.me,Direct
 - DOMAIN-SUFFIX,services.googleapis.cn, 🇺🇸 US
+# AGE动漫网站
+- DOMAIN, www.agedm.org, DIRECT
+- DOMAIN, *.age.tv, DIRECT
+- DOMAIN, *.agefans.com, DIRECT
+- DOMAIN, *.agedm.mys, DIRECT
 
 # BreakSnow
 - PROCESS-NAME,Game.exe, 🇯🇵 JP
 - PROCESS-NAME,snow_launcher.exe,🇯🇵 JP
+
 
 - DOMAIN-KEYWORD,github, Asia
 - DOMAIN-KEYWORD,youtube, 🇺🇸 US
