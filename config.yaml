@@ -1,26 +1,37 @@
-port: 7890
-socks-port: 7891
+mixed-port: 7897
 allow-lan: true
 mode: rule
 log-level: info
 clash-for-android:
-    append-system-dns: false
+  append-system-dns: false
 experimental:
-    sniff-tls-sni: true
+  sniff-tls-sni: true
 unified-delay: true
+external-controller: 127.0.0.1:9090
+external-controller-cors:
+  allow-origins:
+    - "*"
+  allow-private-network: true
 dns:
-    enable: true
-    ipv6: false
-    listen: '0.0.0.0:1053'
-    use-hosts: true
-    default-nameserver: [119.29.29.29, 223.5.5.5, 180.184.1.1]
-    nameserver: [119.28.28.28, 223.6.6.6, 'https://1.12.12.12/dns-query', 'https://dns.alidns.com/dns-query', 'tls://223.6.6.6:853']
-    fake-ip-range: 198.18.0.1/16
+  enable: true
+  ipv6: false
+  listen: "0.0.0.0:1053"
+  use-hosts: true
+  default-nameserver: [119.29.29.29, 223.5.5.5, 180.184.1.1]
+  nameserver:
+    [
+      119.28.28.28,
+      223.6.6.6,
+      "https://1.12.12.12/dns-query",
+      "https://dns.alidns.com/dns-query",
+      "tls://223.6.6.6:853",
+    ]
+  fake-ip-range: 198.18.0.1/16
 
 proxy-providers:
   flywhaler:
     type: http
-    url: https://fjhlcdn.1010520.click/api/v1/client/subscribe?token=69a88044268abe17b08c44097a624d7b
+    url: https://api.1010125.xyz/api/v1/client/subscribe?token=69a88044268abe17b08c44097a624d7b
     path: ./profiles/flywhaler.yml
     health-check:
       enable: true
@@ -37,63 +48,96 @@ proxy-providers:
       interval: 300
 
 proxies:
-   - { name: 'MyProxy', type: trojan, server: 127.0.0.1, port: 33201, password: 7e4d36d6-d1c4-4ba0-9c8c-f38ab389b991, udp: true, sni: music.mcdn.bilivideo.cn, skip-cert-verify: true }
+  - {
+      name: "MyProxy",
+      type: trojan,
+      server: 127.0.0.1,
+      port: 33201,
+      password: 7e4d36d6-d1c4-4ba0-9c8c-f38ab389b991,
+      udp: true,
+      sni: music.mcdn.bilivideo.cn,
+      skip-cert-verify: true,
+    }
 proxy-groups:
-- { name: "Direct", type: select, use: [ flywhaler, spirit ], proxies: [ DIRECT ] }
-- { name: "🇯🇵 JP", type: select, use: [ flywhaler, spirit ], filter: "(?i)日本|JP" }
-- { name: "🇺🇸 US", type: select, use: [ flywhaler, spirit ], filter: "(?i)美国|US" }
-- { name: "Asia", type: select, use: [ flywhaler, spirit ], proxies: [ DIRECT ] }
-- { name: "Auto", type: url-test, use: [ flywhaler, spirit ], url: "https://www.gstatic.com/generate_204", interval: 5, expected-status: 200 }
+  - {
+      name: "Direct",
+      type: select,
+      use: [flywhaler, spirit],
+      proxies: [DIRECT],
+    }
+  - {
+      name: "🇯🇵 JP",
+      type: select,
+      use: [flywhaler, spirit],
+      filter: "(?i)日本|JP",
+    }
+  - {
+      name: "🇺🇸 US",
+      type: select,
+      use: [flywhaler, spirit],
+      filter: "(?i)美国|US",
+    }
+  - { name: "Asia", type: select, use: [flywhaler, spirit], filter: "(?i)香港|HK|台湾|TW", proxies: [DIRECT] }
+  - {
+      name: "Auto",
+      type: url-test,
+      use: [flywhaler, spirit],
+      url: "https://www.gstatic.com/generate_204",
+      interval: 5,
+      expected-status: 200,
+    }
 
 rules:
-# test
-# - DOMAIN-KEYWORD, bilibili, MyProxy
-# Personizations
-- DOMAIN,clash.razord.top,Direct
-- DOMAIN,yacd.haishan.me,Direct
-- DOMAIN-SUFFIX,services.googleapis.cn, 🇺🇸 US
-# AGE动漫网站
-- DOMAIN, www.agedm.org, DIRECT
-- DOMAIN, *.age.tv, DIRECT
-- DOMAIN, *.agefans.com, DIRECT
-- DOMAIN, *.agedm.mys, DIRECT
+  # test
+  # - DOMAIN-KEYWORD, bilibili, MyProxy
+  # Personizations
+  - DOMAIN,clash.razord.top,Direct
+  - DOMAIN,yacd.haishan.me,Direct
+  - DOMAIN-SUFFIX,services.googleapis.cn, 🇺🇸 US
+  # AGE动漫网站
+  - DOMAIN, www.agedm.org, DIRECT
+  - DOMAIN, *.age.tv, DIRECT
+  - DOMAIN, *.agefans.com, DIRECT
+  - DOMAIN, *.agedm.mys, DIRECT
 
-# BreakSnow
-- PROCESS-NAME,Game.exe, 🇯🇵 JP
-- PROCESS-NAME,snow_launcher.exe,🇯🇵 JP
+  # screenpipe
+  - DOMAIN-KEYWORD, posthog, 🇺🇸 US
 
+  # BreakSnow
+  - PROCESS-NAME,Game.exe, 🇯🇵 JP
+  - PROCESS-NAME,snow_launcher.exe,🇯🇵 JP
 
-- DOMAIN-KEYWORD,github, Asia
-- DOMAIN-KEYWORD,youtube, 🇺🇸 US
-- PROCESS-NAME,nvim.exe, Auto
+  - DOMAIN-KEYWORD,github, Asia
+  - DOMAIN-KEYWORD,youtube, 🇺🇸 US
+  - PROCESS-NAME,nvim.exe, Auto
 
-- DOMAIN-SUFFIX, microsoft.com, Direct
+  - DOMAIN-SUFFIX, microsoft.com, Direct
 
-# vue.js doc
-- DOMAIN, play.vuejs.org, Auto
-- DOMAIN-KEYWORD, clashverge, Asia
-- DOMAIN-KEYWORD, metacubex, Asia
+  # vue.js doc
+  - DOMAIN, play.vuejs.org, Auto
+  - DOMAIN-KEYWORD, clashverge, Asia
+  - DOMAIN-KEYWORD, metacubex, Asia
 
-# 邮件
-- DOMAIN-KEYWORD, mail.com, 🇺🇸 US
+  # 邮件
+  - DOMAIN-KEYWORD, mail.com, 🇺🇸 US
 
-# test
-# - MATCH, US
-# Rule sets
-- RULE-SET,applications,Direct
-- RULE-SET,private,Direct
-- RULE-SET,reject,REJECT
-- RULE-SET,icloud,🇺🇸 US
-- RULE-SET,apple,🇺🇸 US
-- RULE-SET,google,🇺🇸 US
-- RULE-SET,proxy,🇺🇸 US
-- RULE-SET,direct,Direct
-- RULE-SET,lancidr,Direct
-- RULE-SET,cncidr,Direct
-- RULE-SET,telegramcidr,🇺🇸 US
-- GEOIP,LAN,Direct
-- GEOIP,CN,Direct
-- MATCH,🇺🇸 US
+  # test
+  # - MATCH, US
+  # Rule sets
+  - RULE-SET,applications,Direct
+  - RULE-SET,private,Direct
+  - RULE-SET,reject,REJECT
+  - RULE-SET,icloud,🇺🇸 US
+  - RULE-SET,apple,🇺🇸 US
+  - RULE-SET,google,🇺🇸 US
+  - RULE-SET,proxy,🇺🇸 US
+  - RULE-SET,direct,Direct
+  - RULE-SET,lancidr,Direct
+  - RULE-SET,cncidr,Direct
+  - RULE-SET,telegramcidr,🇺🇸 US
+  - GEOIP,LAN,Direct
+  - GEOIP,CN,Direct
+  - MATCH,🇺🇸 US
 
 rule-providers:
   reject:
