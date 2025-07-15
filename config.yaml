@@ -31,7 +31,7 @@ dns:
 proxy-providers:
   flywhaler:
     type: http
-    url: https://api.1010125.xyz/api/v1/client/subscribe?token=69a88044268abe17b08c44097a624d7b
+    url: https://fjhl.kxrdy.cn/api/v1/client/subscribe?token=69a88044268abe17b08c44097a624d7b
     path: ./profiles/flywhaler.yml
     health-check:
       enable: true
@@ -40,7 +40,7 @@ proxy-providers:
 
   spirit:
     type: http
-    url: https://linksc.laoyao.ltd/api/v1/client/subscribe?token=313d2af8a5f2a0a834aac4f1b313535f
+    url: https://pd9jg1kf94.laoyao.ltd/api/v1/client/subscribe?token=313d2af8a5f2a0a834aac4f1b313535f
     path: ./profiles/spirit.yml
     health-check:
       enable: true
@@ -77,7 +77,13 @@ proxy-groups:
       use: [flywhaler, spirit],
       filter: "(?i)美国|US",
     }
-  - { name: "Asia", type: select, use: [flywhaler, spirit], filter: "(?i)香港|HK|台湾|TW", proxies: [DIRECT] }
+  - {
+      name: "Asia",
+      type: select,
+      use: [flywhaler, spirit],
+      filter: "(?i)香港|HK|台湾|TW",
+      proxies: [DIRECT],
+    }
   - {
       name: "Auto",
       type: url-test,
@@ -93,22 +99,16 @@ rules:
   # Personizations
   - DOMAIN,clash.razord.top,Direct
   - DOMAIN,yacd.haishan.me,Direct
-  - DOMAIN-SUFFIX,services.googleapis.cn, 🇺🇸 US
+  - DOMAIN-SUFFIX,services.googleapis.cn, Asia
   # AGE动漫网站
   - DOMAIN, www.agedm.org, DIRECT
   - DOMAIN, *.age.tv, DIRECT
   - DOMAIN, *.agefans.com, DIRECT
   - DOMAIN, *.agedm.mys, DIRECT
 
-  # screenpipe
-  - DOMAIN-KEYWORD, posthog, 🇺🇸 US
-
-  # BreakSnow
-  - PROCESS-NAME,Game.exe, 🇯🇵 JP
-  - PROCESS-NAME,snow_launcher.exe,🇯🇵 JP
 
   - DOMAIN-KEYWORD,github, Asia
-  - DOMAIN-KEYWORD,youtube, 🇺🇸 US
+  - DOMAIN-KEYWORD,youtube, Asia
   - PROCESS-NAME,nvim.exe, Auto
 
   - DOMAIN-SUFFIX, microsoft.com, Direct
@@ -119,25 +119,25 @@ rules:
   - DOMAIN-KEYWORD, metacubex, Asia
 
   # 邮件
-  - DOMAIN-KEYWORD, mail.com, 🇺🇸 US
+  - DOMAIN-KEYWORD, mail.com, Asia
 
-  # test
-  # - MATCH, US
+  - DOMAIN-KEYWORD, gamebanana, Asia
+
   # Rule sets
   - RULE-SET,applications,Direct
   - RULE-SET,private,Direct
   - RULE-SET,reject,REJECT
-  - RULE-SET,icloud,🇺🇸 US
-  - RULE-SET,apple,🇺🇸 US
-  - RULE-SET,google,🇺🇸 US
-  - RULE-SET,proxy,🇺🇸 US
+  - RULE-SET,icloud, Asia
+  - RULE-SET,apple, Asia
+  - RULE-SET,google, Asia
+  - RULE-SET,proxy, Asia
   - RULE-SET,direct,Direct
   - RULE-SET,lancidr,Direct
   - RULE-SET,cncidr,Direct
-  - RULE-SET,telegramcidr,🇺🇸 US
+  - RULE-SET,telegramcidr, Asia
   - GEOIP,LAN,Direct
   - GEOIP,CN,Direct
-  - MATCH,🇺🇸 US
+  - MATCH, Asia
 
 rule-providers:
   reject:
