@@ -47,6 +47,14 @@ proxy-providers:
       url: "https://www.gstatic.com/generate_204"
       interval: 300
 
+  liangxinyun:
+    type: http
+    url: https://liangxin.xyz/api/v1/liangxin?OwO=943953640ffd5f35d26c4a763a5a5fc8
+    path: ./profiles/liangxinyun.yml
+    health-check:
+      enable: true
+      url: "https://www.gstatic.com/generate_204"
+      interval: 300
 proxies:
   - {
       name: "MyProxy",
@@ -68,26 +76,26 @@ proxy-groups:
   - {
       name: "🇯🇵 JP",
       type: select,
-      use: [flywhaler, spirit],
+      use: [flywhaler, spirit, liangxinyun],
       filter: "(?i)日本|JP",
     }
   - {
       name: "🇺🇸 US",
       type: select,
-      use: [flywhaler, spirit],
+      use: [flywhaler, spirit, liangxinyun],
       filter: "(?i)美国|US",
     }
   - {
       name: "Asia",
       type: select,
-      use: [flywhaler, spirit],
+      use: [flywhaler, spirit, liangxinyun],
       filter: "(?i)香港|HK|台湾|TW",
       proxies: [DIRECT],
     }
   - {
       name: "Auto",
       type: url-test,
-      use: [flywhaler, spirit],
+      use: [flywhaler, spirit, liangxinyun],
       url: "https://www.gstatic.com/generate_204",
       interval: 5,
       expected-status: 200,
@@ -105,11 +113,12 @@ rules:
   - DOMAIN, *.age.tv, DIRECT
   - DOMAIN, *.agefans.com, DIRECT
   - DOMAIN, *.agedm.mys, DIRECT
+  - DOMAIN-KEYWORD, rwth-aachen, 🇺🇸 US
 
-
-  - DOMAIN-KEYWORD,github, Asia
-  - DOMAIN-KEYWORD,youtube, Asia
-  - PROCESS-NAME,nvim.exe, Auto
+  - DOMAIN-KEYWORD, github, Asia
+  - DOMAIN-KEYWORD, youtube, Asia
+  - DOMAIN-KEYWORD, google, 🇺🇸 US
+  - PROCESS-NAME, nvim.exe, Auto
 
   - DOMAIN-SUFFIX, microsoft.com, Direct
 
@@ -117,6 +126,7 @@ rules:
   - DOMAIN, play.vuejs.org, Auto
   - DOMAIN-KEYWORD, clashverge, Asia
   - DOMAIN-KEYWORD, metacubex, Asia
+  - DOMAIN, repo.maven.apache.org, Asia
 
   # 邮件
   - DOMAIN-KEYWORD, mail.com, Asia
@@ -129,7 +139,7 @@ rules:
   - RULE-SET,reject,REJECT
   - RULE-SET,icloud, Asia
   - RULE-SET,apple, Asia
-  - RULE-SET,google, Asia
+  - RULE-SET,google, 🇺🇸 US
   - RULE-SET,proxy, Asia
   - RULE-SET,direct,Direct
   - RULE-SET,lancidr,Direct
