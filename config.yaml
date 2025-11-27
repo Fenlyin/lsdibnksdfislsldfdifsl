@@ -31,7 +31,7 @@ dns:
 proxy-providers:
   flywhaler:
     type: http
-    url: https://fjhl.kxrdy.cn/api/v1/client/subscribe?token=69a88044268abe17b08c44097a624d7b
+    url: http://gw-lepriiky01.fj520.click/api/v1/client/subscribe?token=69a88044268abe17b08c44097a624d7b
     path: ./profiles/flywhaler.yml
     health-check:
       enable: true
@@ -55,6 +55,9 @@ proxy-providers:
       enable: true
       url: "https://www.gstatic.com/generate_204"
       interval: 300
+
+used_proxies: &used_proxies [flywhaler, liangxinyun]
+
 proxies:
   - {
       name: "MyProxy",
@@ -70,32 +73,32 @@ proxy-groups:
   - {
       name: "Direct",
       type: select,
-      use: [flywhaler, spirit],
+      use: *used_proxies,
       proxies: [DIRECT],
     }
   - {
       name: "🇯🇵 JP",
       type: select,
-      use: [flywhaler, spirit, liangxinyun],
+      use: *used_proxies,
       filter: "(?i)日本|JP",
     }
   - {
       name: "🇺🇸 US",
       type: select,
-      use: [flywhaler, spirit, liangxinyun],
+      use: *used_proxies,
       filter: "(?i)美国|US",
     }
   - {
       name: "Asia",
       type: select,
-      use: [flywhaler, spirit, liangxinyun],
+      use: *used_proxies,
       filter: "(?i)香港|HK|台湾|TW",
       proxies: [DIRECT],
     }
   - {
       name: "Auto",
       type: url-test,
-      use: [flywhaler, spirit, liangxinyun],
+      use: *used_proxies,
       url: "https://www.gstatic.com/generate_204",
       interval: 5,
       expected-status: 200,
