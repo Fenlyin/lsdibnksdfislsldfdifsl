@@ -55,8 +55,21 @@ proxy-providers:
       enable: true
       url: "https://www.gstatic.com/generate_204"
       interval: 300
+    override:
+      additional-prefix: "[liangxinyun]"
 
-used_proxies: &used_proxies [flywhaler, liangxinyun]
+  mojie:
+    type: http
+    url: https://msub.xn--m7r52rosihxm.com/api/v1/client/subscribe?token=493deb175298f24981fb19a08eb88079
+    path: ./profiles/mojie.yml
+    health-check:
+      enable: true
+      url: "https://www.gstatic.com/generate_204"
+      interval: 300
+    override:
+      additional-prefix: "[mojie]"
+      
+used_proxies: &used_proxies [liangxinyun, mojie]
 
 proxies:
   - {
@@ -77,6 +90,12 @@ proxy-groups:
       proxies: [DIRECT],
     }
   - {
+      name: "GPT",
+      type: select,
+      use: [mojie],
+      proxies: [DIRECT],
+    }
+  - {
       name: "🇯🇵 JP",
       type: select,
       use: *used_proxies,
@@ -86,7 +105,7 @@ proxy-groups:
       name: "🇺🇸 US",
       type: select,
       use: *used_proxies,
-      filter: "(?i)美国|US",
+      filter: "(?i)美国|US|日本|JP",
     }
   - {
       name: "Asia",
@@ -135,6 +154,12 @@ rules:
   - DOMAIN-KEYWORD, mail.com, Asia
 
   - DOMAIN-KEYWORD, gamebanana, Asia
+
+  # ChatGPT
+  - DOMAIN-SUFFIX, chatgpt.com, GPT
+  - DOMAIN-SUFFIX, openai.com, GPT
+  - DOMAIN-SUFFIX, auth0.com, GPT
+  - DOMAIN, client-api.arkoselabs.com, GPT
 
   # Rule sets
   - RULE-SET,applications,Direct
