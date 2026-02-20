@@ -90,10 +90,10 @@ proxy-groups:
       proxies: [DIRECT],
     }
   - {
-      name: "GPT",
+      name: "AI-Proxy",
       type: select,
       use: [mojie],
-      proxies: [DIRECT],
+      filter: "(?i)美国|US"
     }
   - {
       name: "🇯🇵 JP",
@@ -139,8 +139,29 @@ rules:
 
   - DOMAIN-KEYWORD, github, Asia
   - DOMAIN-KEYWORD, youtube, Asia
+
+
+  # === ChatGPT ===
+  - DOMAIN-SUFFIX, chatgpt.com, AI-Proxy
+  - DOMAIN-SUFFIX, openai.com, AI-Proxy
+  - DOMAIN-SUFFIX, auth0.com, AI-Proxy
+  - DOMAIN, client-api.arkoselabs.com, AI-Proxy
+  # ==== Gemini 相关 ====
+  # Google AI / Gemini
+  - DOMAIN-SUFFIX,gemini.google.com,AI-Proxy
+  - DOMAIN-SUFFIX,geminiapi.googleapis.com,AI-Proxy
+  - DOMAIN-SUFFIX,googleapis.com,AI-Proxy
+
+  # ==== Claude 相关 ====
+  # Anthropic
+  - DOMAIN-SUFFIX,claude.ai,AI-Proxy
+  - DOMAIN-SUFFIX,api.anthropic.com,AI-Proxy
+
   - DOMAIN-KEYWORD, google, 🇺🇸 US
+
+  # Process
   - PROCESS-NAME, nvim.exe, Auto
+  #- PROCESS-NAME, proxifier.exe, Asia
 
   - DOMAIN-SUFFIX, microsoft.com, Direct
 
@@ -155,11 +176,6 @@ rules:
 
   - DOMAIN-KEYWORD, gamebanana, Asia
 
-  # ChatGPT
-  - DOMAIN-SUFFIX, chatgpt.com, GPT
-  - DOMAIN-SUFFIX, openai.com, GPT
-  - DOMAIN-SUFFIX, auth0.com, GPT
-  - DOMAIN, client-api.arkoselabs.com, GPT
 
   # Rule sets
   - RULE-SET,applications,Direct
