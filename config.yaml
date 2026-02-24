@@ -14,6 +14,7 @@ external-controller-cors:
   allow-private-network: true
 dns:
   enable: true
+  # enhanced-mode: fake-ip
   ipv6: false
   listen: "0.0.0.0:1053"
   use-hosts: true
@@ -88,24 +89,27 @@ proxy-groups:
       type: select,
       use: *used_proxies,
       proxies: [DIRECT],
+      url: "http://detectportal.firefox.com/success.txt"
     }
   - {
       name: "AI-Proxy",
       type: select,
       use: [mojie],
-      filter: "(?i)美国|US"
+      url: "http://www.google.com/generate_204"
     }
   - {
       name: "🇯🇵 JP",
       type: select,
       use: *used_proxies,
       filter: "(?i)日本|JP",
+      url: "https://www.is.gd/"
     }
   - {
       name: "🇺🇸 US",
       type: select,
       use: *used_proxies,
       filter: "(?i)美国|US|日本|JP",
+      url: "http://www.google.com/generate_204"
     }
   - {
       name: "Asia",
@@ -113,15 +117,9 @@ proxy-groups:
       use: *used_proxies,
       filter: "(?i)香港|HK|台湾|TW",
       proxies: [DIRECT],
+      url: "http://www.gstatic.com/generate_204"
     }
-  - {
-      name: "Auto",
-      type: url-test,
-      use: *used_proxies,
-      url: "https://www.gstatic.com/generate_204",
-      interval: 5,
-      expected-status: 200,
-    }
+
 
 rules:
   # test
@@ -138,7 +136,7 @@ rules:
   - DOMAIN-KEYWORD, rwth-aachen, 🇺🇸 US
 
   - DOMAIN-KEYWORD, github, Asia
-  - DOMAIN-KEYWORD, youtube, Asia
+  - DOMAIN-KEYWORD, youtube, 🇺🇸 US
 
 
   # === ChatGPT ===
@@ -151,22 +149,25 @@ rules:
   - DOMAIN-SUFFIX,gemini.google.com,AI-Proxy
   - DOMAIN-SUFFIX,geminiapi.googleapis.com,AI-Proxy
   - DOMAIN-SUFFIX,googleapis.com,AI-Proxy
+  - DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com,AI-Proxy
+  # Google AI Studio 核心域名
+  - DOMAIN,aistudio.google.com,AI-Proxy
+  - DOMAIN,alkalimakersuite-pa.clients6.google.com,AI-Proxy
+  - DOMAIN,generativelanguage.googleapis.com,AI-Proxy
+ 
 
   # ==== Claude 相关 ====
   # Anthropic
   - DOMAIN-SUFFIX,claude.ai,AI-Proxy
   - DOMAIN-SUFFIX,api.anthropic.com,AI-Proxy
 
-  - DOMAIN-KEYWORD, google, 🇺🇸 US
-
   # Process
-  - PROCESS-NAME, nvim.exe, Auto
-  #- PROCESS-NAME, proxifier.exe, Asia
+  - PROCESS-NAME, nvim.exe, Asia
 
   - DOMAIN-SUFFIX, microsoft.com, Direct
 
   # vue.js doc
-  - DOMAIN, play.vuejs.org, Auto
+  - DOMAIN, play.vuejs.org, Asia
   - DOMAIN-KEYWORD, clashverge, Asia
   - DOMAIN-KEYWORD, metacubex, Asia
   - DOMAIN, repo.maven.apache.org, Asia
@@ -175,6 +176,10 @@ rules:
   - DOMAIN-KEYWORD, mail.com, Asia
 
   - DOMAIN-KEYWORD, gamebanana, Asia
+
+  # 阿里云
+  - DOMAIN-KEYWORD, alibabacloud, DIRECT
+  - DOMAIN-KEYWORD, account-cn, DIRECT
 
 
   # Rule sets
