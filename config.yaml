@@ -8,13 +8,13 @@ experimental:
   sniff-tls-sni: true
 unified-delay: true
 external-controller: 127.0.0.1:9090
+external-ui: ui
 external-controller-cors:
   allow-origins:
     - "*"
   allow-private-network: true
 dns:
   enable: true
-  # enhanced-mode: fake-ip
   ipv6: false
   listen: "0.0.0.0:1053"
   use-hosts: true
@@ -41,7 +41,7 @@ proxy-providers:
 
   spirit:
     type: http
-    url: https://pd9jg1kf94.laoyao.ltd/api/v1/client/subscribe?token=313d2af8a5f2a0a834aac4f1b313535f
+    url: https://subscription.riolu.link/RioLU/system/api/v1/client/subscribe?token=313d2af8a5f2a0a834aac4f1b313535f
     path: ./profiles/spirit.yml
     health-check:
       enable: true
@@ -70,7 +70,7 @@ proxy-providers:
     override:
       additional-prefix: "[mojie]"
       
-used_proxies: &used_proxies [liangxinyun, mojie]
+used_proxies: &used_proxies [liangxinyun, spirit]
 
 proxies:
   - {
@@ -83,120 +83,177 @@ proxies:
       sni: music.mcdn.bilivideo.cn,
       skip-cert-verify: true,
     }
-proxy-groups:
-  - {
-      name: "Direct",
-      type: select,
-      use: *used_proxies,
-      proxies: [DIRECT],
-      url: "http://detectportal.firefox.com/success.txt"
-    }
-  - {
-      name: "AI-Proxy",
-      type: select,
-      use: [mojie],
-      url: "http://www.google.com/generate_204"
-    }
-  - {
-      name: "🇯🇵 JP",
-      type: select,
-      use: *used_proxies,
-      filter: "(?i)日本|JP",
-      url: "https://www.is.gd/"
-    }
-  - {
-      name: "🇺🇸 US",
-      type: select,
-      use: *used_proxies,
-      filter: "(?i)美国|US|日本|JP",
-      url: "http://www.google.com/generate_204"
-    }
-  - {
-      name: "Asia",
-      type: select,
-      use: *used_proxies,
-      filter: "(?i)香港|HK|台湾|TW",
-      proxies: [DIRECT],
-      url: "http://www.gstatic.com/generate_204"
-    }
 
+proxy-groups:
+  # ============ 各 Provider 单独组 (hidden) ============
+  # --- liangxinyun ---
+  - name: "🇯🇵 JP-liangxinyun"
+    type: url-test
+    use: [liangxinyun]
+    filter: "(?i)日本|JP"
+    url: "http://www.google.co.jp/generate_204"
+    interval: 300
+    hidden: true
+
+  - name: "🇺🇸 US-liangxinyun"
+    type: url-test
+    use: [liangxinyun]
+    filter: "(?i)美国|US"
+    url: "http://www.gstatic.com/generate_204"
+    interval: 300
+    hidden: true
+
+  - name: "Asia-liangxinyun"
+    type: url-test
+    use: [liangxinyun]
+    filter: "(?i)香港|HK|台湾|TW"
+    url: "http://www.gstatic.com/generate_204"
+    interval: 300
+    hidden: true
+
+  # --- spirit ---
+  - name: "🇯🇵 JP-spirit"
+    type: url-test
+    use: [spirit]
+    filter: "(?i)日本|JP"
+    url: "http://www.google.co.jp/generate_204"
+    interval: 300
+    hidden: true
+
+  - name: "🇺🇸 US-spirit"
+    type: url-test
+    use: [spirit]
+    filter: "(?i)美国|US"
+    url: "http://www.gstatic.com/generate_204"
+    interval: 300
+    hidden: true
+
+  - name: "Asia-spirit"
+    type: url-test
+    use: [spirit]
+    filter: "(?i)香港|HK|台湾|TW"
+    url: "http://www.gstatic.com/generate_204"
+    interval: 300
+    hidden: true
+
+  # ============ 外层 Fallback 嵌套组 ============
+  - name: "🇯🇵 JP"
+    type: fallback
+    proxies:
+      - "🇯🇵 JP-liangxinyun"
+      - "🇯🇵 JP-spirit"
+
+  - name: "🇺🇸 US"
+    type: fallback
+    proxies:
+      - "🇺🇸 US-liangxinyun"
+      - "🇺🇸 US-spirit"
+
+  - name: "Asia"
+    type: fallback
+    proxies:
+      - "Asia-liangxinyun"
+      - "Asia-spirit"
+
+  # ============ 其他组 ============
+  - name: "Direct"
+    type: select
+    use: *used_proxies
+    proxies: [DIRECT]
+    url: "http://detectportal.firefox.com/success.txt"
+
+  - name: "AI-Proxy"
+    type: select
+    use: [spirit]
+    url: "http://www.google.com/generate_204"
+
+  # ============ 干净 IP 组 ============
+  - name: "CleanIP"
+    type: fallback
+    proxies:
+      - "🇺🇸 US-liangxinyun"
+      - "🇺🇸 US-spirit"
+    hidden: true
 
 rules:
-  # test
-  # - DOMAIN-KEYWORD, bilibili, MyProxy
-  # Personizations
+  # ============ 管理界面直连 ============
   - DOMAIN,clash.razord.top,Direct
   - DOMAIN,yacd.haishan.me,Direct
-  - DOMAIN-SUFFIX,services.googleapis.cn, Asia
-  # AGE动漫网站
-  - DOMAIN, www.agedm.org, DIRECT
-  - DOMAIN, *.age.tv, DIRECT
-  - DOMAIN, *.agefans.com, DIRECT
-  - DOMAIN, *.agedm.mys, DIRECT
-  - DOMAIN-KEYWORD, rwth-aachen, 🇺🇸 US
 
-  - DOMAIN-KEYWORD, github, Asia
-  - DOMAIN-KEYWORD, youtube, 🇺🇸 US
+  # ============ 干净 IP 专用 (支付/银行/Gmail 等) ============
+  - DOMAIN-SUFFIX,paypal.com,CleanIP
+  - DOMAIN-SUFFIX,paypalobjects.com,CleanIP
+  - DOMAIN-KEYWORD,bank,CleanIP
+  - DOMAIN-SUFFIX,gmail.com,CleanIP
+  - DOMAIN-SUFFIX,googlemail.com,CleanIP
 
-
-  # === ChatGPT ===
-  - DOMAIN-SUFFIX, chatgpt.com, AI-Proxy
-  - DOMAIN-SUFFIX, openai.com, AI-Proxy
-  - DOMAIN-SUFFIX, auth0.com, AI-Proxy
-  - DOMAIN, client-api.arkoselabs.com, AI-Proxy
-  # ==== Gemini 相关 ====
-  # Google AI / Gemini
+  # ============ AI 服务 ============
+  # ChatGPT
+  - DOMAIN-SUFFIX,chatgpt.com,AI-Proxy
+  - DOMAIN-SUFFIX,openai.com,AI-Proxy
+  - DOMAIN-SUFFIX,auth0.com,AI-Proxy
+  - DOMAIN,client-api.arkoselabs.com,AI-Proxy
+  # Gemini / Google AI
   - DOMAIN-SUFFIX,gemini.google.com,AI-Proxy
   - DOMAIN-SUFFIX,geminiapi.googleapis.com,AI-Proxy
   - DOMAIN-SUFFIX,googleapis.com,AI-Proxy
   - DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com,AI-Proxy
-  # Google AI Studio 核心域名
   - DOMAIN,aistudio.google.com,AI-Proxy
   - DOMAIN,alkalimakersuite-pa.clients6.google.com,AI-Proxy
   - DOMAIN,generativelanguage.googleapis.com,AI-Proxy
- 
-
-  # ==== Claude 相关 ====
-  # Anthropic
+  # Claude
   - DOMAIN-SUFFIX,claude.ai,AI-Proxy
   - DOMAIN-SUFFIX,api.anthropic.com,AI-Proxy
+  # Google Scholar
+  - DOMAIN,scholar.google.com,AI-Proxy
 
-  # Process
-  - PROCESS-NAME, nvim.exe, Asia
+  # ============ 流媒体/视频 ============
+  - DOMAIN-KEYWORD,youtube,🇺🇸 US
 
-  - DOMAIN-SUFFIX, microsoft.com, Direct
+  # ============ 开发/技术 ============
+  - DOMAIN-KEYWORD,github,Asia
+  - DOMAIN,play.vuejs.org,Asia
+  - DOMAIN,repo.maven.apache.org,Asia
+  - DOMAIN-KEYWORD,clashverge,Asia
+  - DOMAIN-KEYWORD,metacubex,Asia
 
-  # vue.js doc
-  - DOMAIN, play.vuejs.org, Asia
-  - DOMAIN-KEYWORD, clashverge, Asia
-  - DOMAIN-KEYWORD, metacubex, Asia
-  - DOMAIN, repo.maven.apache.org, Asia
+  # ============ 游戏 ============
+  - DOMAIN-KEYWORD,gamebanana,Asia
+  - DOMAIN-KEYWORD,rwth-aachen,🇺🇸 US
 
-  # 邮件
-  - DOMAIN-KEYWORD, mail.com, Asia
+  # ============ 邮件 ============
+  - DOMAIN-SUFFIX,mail.com,Asia
 
-  - DOMAIN-KEYWORD, gamebanana, Asia
+  # ============ 进程规则 ============
+  - PROCESS-NAME,nvim.exe,Asia
+  - PROCESS-NAME,Proxifier.exe,Asia
 
-  # 阿里云
-  - DOMAIN-KEYWORD, alibabacloud, DIRECT
-  - DOMAIN-KEYWORD, account-cn, DIRECT
+  # ============ 国内服务直连 ============
+  - DOMAIN-SUFFIX,microsoft.com,Direct
+  - DOMAIN-SUFFIX,alibabacloud,DIRECT
+  - DOMAIN-KEYWORD,account-cn,DIRECT
+  # AGE 动漫
+  - DOMAIN,www.agedm.org,DIRECT
+  - DOMAIN,*.age.tv,DIRECT
+  - DOMAIN,*.agefans.com,DIRECT
+  - DOMAIN,*.agedm.mys,DIRECT
 
-
-  # Rule sets
+  # ============ 规则集 ============
   - RULE-SET,applications,Direct
   - RULE-SET,private,Direct
   - RULE-SET,reject,REJECT
-  - RULE-SET,icloud, Asia
-  - RULE-SET,apple, Asia
-  - RULE-SET,google, 🇺🇸 US
-  - RULE-SET,proxy, Asia
+  - RULE-SET,icloud,Asia
+  - RULE-SET,apple,Asia
+  - RULE-SET,google,🇺🇸 US
+  - RULE-SET,proxy,Asia
   - RULE-SET,direct,Direct
   - RULE-SET,lancidr,Direct
   - RULE-SET,cncidr,Direct
-  - RULE-SET,telegramcidr, Asia
+  - RULE-SET,telegramcidr,Asia
+
+  # ============ 兜底 ============
   - GEOIP,LAN,Direct
-  - GEOIP,CN,Direct
-  - MATCH, Asia
+  - MATCH,🇺🇸 US
 
 rule-providers:
   reject:
