@@ -30,15 +30,6 @@ dns:
   fake-ip-range: 198.18.0.1/16
 
 proxy-providers:
-  flywhaler:
-    type: http
-    url: http://gw-lepriiky01.fj520.click/api/v1/client/subscribe?token=69a88044268abe17b08c44097a624d7b
-    path: ./profiles/flywhaler.yml
-    health-check:
-      enable: true
-      url: "https://www.gstatic.com/generate_204"
-      interval: 300
-
   spirit:
     type: http
     url: https://subscription.riolu.link/RioLU/system/api/v1/client/subscribe?token=313d2af8a5f2a0a834aac4f1b313535f
@@ -59,17 +50,6 @@ proxy-providers:
     override:
       additional-prefix: "[liangxinyun]"
 
-  mojie:
-    type: http
-    url: https://msub.xn--m7r52rosihxm.com/api/v1/client/subscribe?token=493deb175298f24981fb19a08eb88079
-    path: ./profiles/mojie.yml
-    health-check:
-      enable: true
-      url: "https://www.gstatic.com/generate_204"
-      interval: 300
-    override:
-      additional-prefix: "[mojie]"
-      
 used_proxies: &used_proxies [liangxinyun, spirit]
 
 proxies:
@@ -162,18 +142,12 @@ proxy-groups:
     proxies: [DIRECT]
     url: "http://detectportal.firefox.com/success.txt"
 
-  - name: "AI-Proxy"
+  # ============ 干净 IP 组 ============
+  - name: "CleanIP"
     type: select
     use: [spirit]
     url: "http://www.google.com/generate_204"
 
-  # ============ 干净 IP 组 ============
-  - name: "CleanIP"
-    type: fallback
-    proxies:
-      - "🇺🇸 US-liangxinyun"
-      - "🇺🇸 US-spirit"
-    hidden: true
 
 rules:
   # ============ 管理界面直连 ============
@@ -181,31 +155,32 @@ rules:
   - DOMAIN,yacd.haishan.me,Direct
 
   # ============ 干净 IP 专用 (支付/银行/Gmail 等) ============
-  - DOMAIN-SUFFIX,paypal.com,CleanIP
-  - DOMAIN-SUFFIX,paypalobjects.com,CleanIP
-  - DOMAIN-KEYWORD,bank,CleanIP
-  - DOMAIN-SUFFIX,gmail.com,CleanIP
-  - DOMAIN-SUFFIX,googlemail.com,CleanIP
+  - DOMAIN-SUFFIX,paypal.com, CleanIP
+  - DOMAIN-SUFFIX,paypalobjects.com, CleanIP
+  - DOMAIN-KEYWORD,bank, CleanIP
+  - DOMAIN-SUFFIX,gmail.com, CleanIP
+  - DOMAIN-SUFFIX,googlemail.com, CleanIP
+  - DOMAIN, ping0.cc, CleanIP
 
   # ============ AI 服务 ============
   # ChatGPT
-  - DOMAIN-SUFFIX,chatgpt.com,AI-Proxy
-  - DOMAIN-SUFFIX,openai.com,AI-Proxy
-  - DOMAIN-SUFFIX,auth0.com,AI-Proxy
-  - DOMAIN,client-api.arkoselabs.com,AI-Proxy
+  - DOMAIN-SUFFIX,chatgpt.com, CleanIP
+  - DOMAIN-SUFFIX,openai.com, CleanIP
+  - DOMAIN-SUFFIX,auth0.com, CleanIP
+  - DOMAIN,client-api.arkoselabs.com, CleanIP
   # Gemini / Google AI
-  - DOMAIN-SUFFIX,gemini.google.com,AI-Proxy
-  - DOMAIN-SUFFIX,geminiapi.googleapis.com,AI-Proxy
-  - DOMAIN-SUFFIX,googleapis.com,AI-Proxy
-  - DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com,AI-Proxy
-  - DOMAIN,aistudio.google.com,AI-Proxy
-  - DOMAIN,alkalimakersuite-pa.clients6.google.com,AI-Proxy
-  - DOMAIN,generativelanguage.googleapis.com,AI-Proxy
+  - DOMAIN-SUFFIX,gemini.google.com, CleanIP
+  - DOMAIN-SUFFIX,geminiapi.googleapis.com, CleanIP
+  - DOMAIN-SUFFIX,googleapis.com, CleanIP
+  - DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com, CleanIP
+  - DOMAIN,aistudio.google.com, CleanIP
+  - DOMAIN,alkalimakersuite-pa.clients6.google.com, CleanIP
+  - DOMAIN,generativelanguage.googleapis.com, CleanIP
   # Claude
-  - DOMAIN-SUFFIX,claude.ai,AI-Proxy
-  - DOMAIN-SUFFIX,api.anthropic.com,AI-Proxy
+  - DOMAIN-SUFFIX,claude.ai, CleanIP
+  - DOMAIN-SUFFIX,api.anthropic.com, CleanIP
   # Google Scholar
-  - DOMAIN,scholar.google.com,AI-Proxy
+  - DOMAIN,scholar.google.com, CleanIP
 
   # ============ 流媒体/视频 ============
   - DOMAIN-KEYWORD,youtube,🇺🇸 US
