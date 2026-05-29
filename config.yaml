@@ -1,6 +1,7 @@
 mixed-port: 7897
 allow-lan: true
 mode: rule
+ipv6: false
 log-level: info
 clash-for-android:
   append-system-dns: false
@@ -28,6 +29,15 @@ dns:
       "tls://223.6.6.6:853",
     ]
   fake-ip-range: 198.18.0.1/16
+tun:
+  enable: true
+  stack: mixed
+  device: utun-clash
+  dns-hijack:
+    - 0.0.0.0:53
+    - tcp://0.0.0.0:53
+  auto-route: true
+  auto-detect-interface: true
 
 proxy-providers:
   spirit:
@@ -52,18 +62,6 @@ proxy-providers:
 
 used_proxies: &used_proxies [liangxinyun, spirit]
 
-proxies:
-  - {
-      name: "MyProxy",
-      type: trojan,
-      server: 127.0.0.1,
-      port: 33201,
-      password: 7e4d36d6-d1c4-4ba0-9c8c-f38ab389b991,
-      udp: true,
-      sni: music.mcdn.bilivideo.cn,
-      skip-cert-verify: true,
-    }
-
 proxy-groups:
   # ============ 各 Provider 单独组 (hidden) ============
   # --- liangxinyun ---
@@ -71,7 +69,7 @@ proxy-groups:
     type: url-test
     use: [liangxinyun]
     filter: "(?i)日本|JP"
-    url: "http://www.google.co.jp/generate_204"
+    url: "https://www.google.co.jp/generate_204"
     interval: 300
     hidden: true
 
@@ -79,7 +77,7 @@ proxy-groups:
     type: url-test
     use: [liangxinyun]
     filter: "(?i)美国|US"
-    url: "http://www.gstatic.com/generate_204"
+    url: "https://www.gstatic.com/generate_204"
     interval: 300
     hidden: true
 
@@ -87,7 +85,7 @@ proxy-groups:
     type: url-test
     use: [liangxinyun]
     filter: "(?i)香港|HK|台湾|TW"
-    url: "http://www.gstatic.com/generate_204"
+    url: "https://www.gstatic.com/generate_204"
     interval: 300
     hidden: true
 
@@ -96,7 +94,7 @@ proxy-groups:
     type: url-test
     use: [spirit]
     filter: "(?i)日本|JP"
-    url: "http://www.google.co.jp/generate_204"
+    url: "https://www.google.co.jp/generate_204"
     interval: 300
     hidden: true
 
@@ -104,7 +102,7 @@ proxy-groups:
     type: url-test
     use: [spirit]
     filter: "(?i)美国|US"
-    url: "http://www.gstatic.com/generate_204"
+    url: "https://www.gstatic.com/generate_204"
     interval: 300
     hidden: true
 
@@ -112,7 +110,7 @@ proxy-groups:
     type: url-test
     use: [spirit]
     filter: "(?i)香港|HK|台湾|TW"
-    url: "http://www.gstatic.com/generate_204"
+    url: "https://www.gstatic.com/generate_204"
     interval: 300
     hidden: true
 
@@ -140,21 +138,22 @@ proxy-groups:
     type: select
     use: *used_proxies
     proxies: [DIRECT]
-    url: "http://detectportal.firefox.com/success.txt"
+    url: "https://detectportal.firefox.com/success.txt"
 
   # ============ 干净 IP 组 ============
   - name: "CleanIP"
     type: select
     use: [spirit]
-    url: "http://www.google.com/generate_204"
-
+    url: "https://www.google.com/generate_204"
 
 rules:
+  - DOMAIN-KEYWORD, 44mmd, Direct
+  - DOMAIN, pv.sohu.com, DIRECT
   # ============ 管理界面直连 ============
   - DOMAIN,clash.razord.top,Direct
   - DOMAIN,yacd.haishan.me,Direct
 
-  # ============ 干净 IP 专用 (支付/银行/Gmail 等) ============
+  # ============ 干净 IP 专用 ============
   - DOMAIN-SUFFIX,paypal.com, CleanIP
   - DOMAIN-SUFFIX,paypalobjects.com, CleanIP
   - DOMAIN-KEYWORD,bank, CleanIP
@@ -178,9 +177,11 @@ rules:
   - DOMAIN,generativelanguage.googleapis.com, CleanIP
   # Claude
   - DOMAIN-SUFFIX,claude.ai, CleanIP
-  - DOMAIN-SUFFIX,api.anthropic.com, CleanIP
+  - DOMAIN-SUFFIX,anthropic.com, CleanIP
   # Google Scholar
   - DOMAIN,scholar.google.com, CleanIP
+
+  - DOMAIN, opencode.ai, Asia
 
   # ============ 流媒体/视频 ============
   - DOMAIN-KEYWORD,youtube,🇺🇸 US
@@ -191,30 +192,18 @@ rules:
   - DOMAIN,repo.maven.apache.org,Asia
   - DOMAIN-KEYWORD,clashverge,Asia
   - DOMAIN-KEYWORD,metacubex,Asia
+  - DOMAIN-KEYWORD,pytorch,Asia
 
   # ============ 游戏 ============
   - DOMAIN-KEYWORD,gamebanana,Asia
   - DOMAIN-KEYWORD,rwth-aachen,🇺🇸 US
 
-  # ============ 邮件 ============
-  - DOMAIN-SUFFIX,mail.com,Asia
-
-  # ============ 进程规则 ============
-  - PROCESS-NAME,nvim.exe,Asia
-  - PROCESS-NAME,Proxifier.exe,Asia
-
   # ============ 国内服务直连 ============
   - DOMAIN-SUFFIX,microsoft.com,Direct
   - DOMAIN-SUFFIX,alibabacloud,DIRECT
   - DOMAIN-KEYWORD,account-cn,DIRECT
-  # AGE 动漫
-  - DOMAIN,www.agedm.org,DIRECT
-  - DOMAIN,*.age.tv,DIRECT
-  - DOMAIN,*.agefans.com,DIRECT
-  - DOMAIN,*.agedm.mys,DIRECT
 
   # ============ 规则集 ============
-  - RULE-SET,applications,Direct
   - RULE-SET,private,Direct
   - RULE-SET,reject,REJECT
   - RULE-SET,icloud,Asia
@@ -225,6 +214,7 @@ rules:
   - RULE-SET,lancidr,Direct
   - RULE-SET,cncidr,Direct
   - RULE-SET,telegramcidr,Asia
+  - RULE-SET,applications,Direct
 
   # ============ 兜底 ============
   - GEOIP,LAN,Direct
